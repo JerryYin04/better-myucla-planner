@@ -9,6 +9,7 @@
  *   position  change one card's position control and screenshot the result
  *   top       press "move to top" on an off-screen card
  *   finals    open the final exam week panel and read what it placed
+ *   jump      click a meeting in the weekly grid and see where the page lands
  */
 
 import { mkdir, readFile } from "node:fs/promises";
@@ -275,6 +276,57 @@ if (scenario === "finals") {
   );
 
   await shot("page");
+}
+
+if (scenario === "jump") {
+  const linked = await page.evaluate(() => {
+    const blocks = [...document.querySelectorAll("#gridDiv .planneritembox")];
+    return {
+      blocks: blocks.length,
+      linked: blocks.filter((b) => b.dataset.plJump).length,
+      pointer: blocks
+        .filter((b) => b.dataset.plJump)
+        .every((b) => getComputedStyle(b).cursor === "pointer")
+    };
+  });
+
+  // Pick a block whose card is far enough down the list that finding it by hand
+  // is the whole problem.
+  const pick = await page.evaluate(() => {
+    const blocks = [...document.querySelectorAll("#gridDiv .planneritembox")];
+    let best = null;
+    for (const block of blocks) {
+      const id = block.dataset.plJump;
+      if (!id) continue;
+      const cards = [...document.querySelectorAll("#div_landing > table > tbody.courseItem")];
+      const digits = id.slice(id.lastIndexOf("-") + 1);
+      const index = cards.findIndex((c) => c.classList.contains(`Class${digits}`));
+      if (index > (best?.index ?? -1)) {
+        best = { index, code: (block.childNodes[0].textContent || "").trim(), id };
+      }
+    }
+    return best;
+  });
+
+  if (!pick) throw new Error("No grid block could be matched to a card.");
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(200);
+  const before = await page.evaluate(() => Math.round(window.scrollY));
+  await page.click(`#gridDiv .planneritembox[data-pl-jump="${pick.id}"]`);
+  await page.waitForTimeout(1400);
+
+  const landed = await page.evaluate((id) => {
+    const card = document.querySelector(`#div_landing tbody.Class${id.slice(id.lastIndexOf("-") + 1)}`);
+    const box = card?.getBoundingClientRect();
+    return {
+      scrollY: Math.round(window.scrollY),
+      cardTop: box ? Math.round(box.top) : null,
+      inView: box ? box.top > -50 && box.top < window.innerHeight : false
+    };
+  }, pick.id);
+
+  console.log({ ...linked, clicked: pick.code, cardIndex: pick.index, before, ...landed });
+  await shot("landed");
 }
 
 await browser.close();

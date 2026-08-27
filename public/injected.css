@@ -1131,12 +1131,12 @@ html.pl-boot #ctl00_MainContent_classPlanPanel {
   border-bottom: 3px double var(--pl-line);
 }
 
-/* Our own switch, living in MyUCLA'''s row of display switches beside Study
+/* Our own switch, living in MyUCLA's row of display switches beside Study
    List, Plan and Alternates. Only while the optional layout switch is on, per
-   the rule 0.10.1 settled: MyUCLA'''s markup is opt-in.
+   the rule 0.10.1 settled: MyUCLA's markup is opt-in.
 
-   It borrows the row'''s grammar so it does not read as bolted on, and departs
-   from it in exactly one way — the label is our blue rather than MyUCLA'''s link
+   It borrows the row's grammar so it does not read as bolted on, and departs
+   from it in exactly one way — the label is our blue rather than MyUCLA's link
    colour, so a student can tell whose control this is. It sends nothing: it
    opens and closes a panel on this page. */
 .pl-native-toggle {
@@ -1159,3 +1159,14 @@ html.pl-boot #ctl00_MainContent_classPlanPanel {
 }
 
 .pl-native-on .pl-native-check { color: var(--pl-blue-dark) !important; }
+/* A meeting in MyUCLA's own weekly grid that we could identify with certainty.
+   The only change to MyUCLA's markup is the pointer and the focus ring a
+   clickable thing needs — no colour, no size, no position. A block we could not
+   identify gets none of this, so the pointer is the promise that the link
+   goes somewhere. */
+#gridDiv .planneritembox[data-pl-jump] { cursor: pointer; }
+
+#gridDiv .planneritembox[data-pl-jump]:focus-visible {
+  outline: 2px solid #204e91;
+  outline-offset: 1px;
+}

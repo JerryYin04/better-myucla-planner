@@ -71,6 +71,12 @@ export function restoreWeekGrid(doc: Document = document): void {
 export interface CourseHeadline {
   /** Subject plus catalogue number, the string a student actually scans for. */
   code: string;
+  /**
+   * The catalogue number alone. MyUCLA's weekly grid abbreviates the subject
+   * but writes this identically, so it is the only half of the code that can be
+   * compared across the two.
+   */
+  number: string;
   title: string;
   ordinal: string;
 }
@@ -106,7 +112,7 @@ export function readHeadline(labelHost: HTMLElement): CourseHeadline | null {
   const title = bodyMatch[2].trim();
   if (!subject || !number || !title) return null;
 
-  return { code: `${subject} ${number}`, title, ordinal: headMatch[1] };
+  return { code: `${subject} ${number}`, number, title, ordinal: headMatch[1] };
 }
 
 /**

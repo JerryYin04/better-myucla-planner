@@ -29,6 +29,7 @@ describe("course headline", () => {
     const host = titleCell("Class 15: Management", "170 - Real Estate Finance and Investments");
     expect(readHeadline(host)).toEqual({
       code: "Management 170",
+      number: "170",
       title: "Real Estate Finance and Investments",
       ordinal: "15"
     });

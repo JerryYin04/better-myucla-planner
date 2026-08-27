@@ -23,6 +23,7 @@ import {
 } from "./page-polish";
 import { FastReorderCoordinator } from "./fast-reorder";
 import { buildFinalsWeek, type FinalsEntry } from "./finals-week";
+import { linkGridBlocks } from "./grid-link";
 import {
   conflictCodes,
   inspectCourse,
@@ -366,6 +367,7 @@ export class MyUclaPlannerController {
       tidyWeekGrid(document);
     }
     this.ensureFinalsToggle();
+    this.linkWeekGrid(contract.courses);
     const byId = new Map(contract.courses.map((course) => [course.id, course]));
     effectiveOrder.forEach((id, index) => {
       const course = byId.get(id);
@@ -1754,9 +1756,64 @@ export class MyUclaPlannerController {
     host.classList.toggle("pl-native-on", open);
   }
 
+  /**
+   * Makes each meeting in MyUCLA's weekly grid a way into the class it belongs
+   * to. The grid is re-rendered by its own toggles, so this runs on every pass
+   * and skips blocks it has already claimed.
+   *
+   * The only change to MyUCLA's own markup is a pointer, a tooltip and the
+   * keyboard handles a clickable thing needs. Nothing is restyled and nothing
+   * is moved: a block this cannot identify with certainty is left exactly as
+   * MyUCLA drew it, with no affordance at all, so the pointer is itself the
+   * promise that the link is real.
+   */
+  private linkWeekGrid(courses: CourseSnapshot[]): void {
+    const blocks = [
+      ...document.querySelectorAll<HTMLElement>("#gridDiv .planneritembox")
+    ];
+    if (blocks.length === 0) return;
+
+    blocks.forEach((block) => {
+      if (block.dataset.plJump) {
+        delete block.dataset.plJump;
+        block.removeAttribute("role");
+        block.removeAttribute("tabindex");
+      }
+    });
+
+    linkGridBlocks(blocks, courses).forEach(({ block, courseId }) => {
+      block.dataset.plJump = courseId;
+      block.setAttribute("role", "link");
+      block.tabIndex = 0;
+      // MyUCLA already puts the full block text in `title` when the layout
+      // switch is on; leave that alone rather than overwrite what it says.
+      if (!block.title) block.title = "Show this class in the plan";
+    });
+  }
+
+  private jumpToCourse(courseId: string): void {
+    const node = this.orderedNodes().get(courseId);
+    if (!node) return;
+    // Plans of eight or more open collapsed, so the card you were sent to could
+    // be a title bar. Open it, since being shown a class means being shown it.
+    if (this.collapsedCourses.delete(courseId)) {
+      this.applyViewState();
+      this.persistViewState();
+    }
+    node.scrollIntoView({ behavior: "smooth", block: "center" });
+    this.flashCard(node);
+  }
+
   private onClick = (event: MouseEvent): void => {
     const target = event.target;
     if (!(target instanceof Element)) return;
+    const jump = target.closest<HTMLElement>("[data-pl-jump]");
+    if (jump && jump.dataset.plJump) {
+      this.closeMenu();
+      this.jumpToCourse(jump.dataset.plJump);
+      return;
+    }
+
     const button = target.closest<HTMLButtonElement>("[data-pl-action]");
     if (!button) {
       this.closeMenu();
@@ -1894,7 +1951,17 @@ export class MyUclaPlannerController {
     }
 
     const target = event.target;
-    if (!(target instanceof HTMLElement) || !target.matches('[data-pl-action="drag"]')) {
+    if (!(target instanceof HTMLElement)) return;
+
+    // A grid block is announced as a link, so it has to answer the keys a link
+    // answers.
+    if (target.dataset.plJump && (event.key === "Enter" || event.key === " ")) {
+      event.preventDefault();
+      this.jumpToCourse(target.dataset.plJump);
+      return;
+    }
+
+    if (!target.matches('[data-pl-action="drag"]')) {
       return;
     }
     if (!event.altKey || !["ArrowUp", "ArrowDown"].includes(event.key)) return;
