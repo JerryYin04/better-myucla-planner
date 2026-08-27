@@ -146,6 +146,22 @@ Measured on the live page on 2026-08-22:
 - Extension-owned DOM mutations are ignored to prevent reconcile loops.
 - Reorder confirmation is an inline page bar instead of a blocking browser dialog; confirmation is still required.
 - Existing MyUCLA color picker, multiple Plans, optimizer, and conflict UI are preserved.
+- Final exam parsing lives in `plan-insights.ts` and fails closed four ways: the
+  line must match one of MyUCLA's **two** formats exactly, the month must be a
+  month, the weekday must agree with the date, and the end must follow the
+  start. The undated format carries no year, so it comes from the term chooser
+  via `adapter.getTermYear()` — and the weekday check is what makes that
+  inference safe, since December 9 is a Wednesday in 2026 and a Thursday in
+  2027. Anything unplaced is still shown, verbatim, under the calendar; dropping
+  `Consult instructor` would read as "this class has no exam".
+- The `Final Exams` switch injected into `.classPlanner_SectionMenu` is the one
+  place we add a control to MyUCLA's own markup, so it follows the same rule as
+  `page-polish.ts`: it exists only while the layout switch is on, and the
+  overflow menu entry stays for everyone else. It keeps its own id, reuses none
+  of MyUCLA's, and never calls `triggerPostback`.
+- `grid-link.ts` reads only `table.coursetable` rows of exactly nine cells. That
+  is what skips the Plan Actions row, which holds the **Enroll** button, and it
+  skips it by shape rather than by name.
 
 ## Real-page facts already verified
 
@@ -177,6 +193,14 @@ Exact sanitized selectors and button rules are in `docs/MYUCLA_CONTRACT.md`.
   filtering, collapse state, tags, move feedback, confirmation UI.
 - `src/content/navigation-reorder.ts` — cross-navigation one-step reorder coordinator.
 - `src/content/plan-insights.ts` — pure read-only status detection, filtering, and summary logic.
+- `src/content/finals-week.ts` — pure builder for the finals calendar. Takes a
+  label, a parsed `FinalExam` and a study-list flag per class and returns an
+  element; it reads no DOM of its own, so every case (nothing dated, nothing at
+  all, an exam outside the anchored week) is a unit test rather than a page.
+- `src/content/grid-link.ts` — joins a `#gridDiv .planneritembox` to the card it
+  belongs to on catalogue number, section and location. The subject is never
+  compared: MyUCLA's grid abbreviates it and the card spells it out. Ambiguous
+  or unreadable blocks return nothing rather than a guess.
 - `src/domain/reorder.ts` — adjacent-move planning and expected-order functions.
 - `src/storage/annotations.ts` — validated local tag storage.
 - `public/injected.css` — real-page styles; selectors are namespaced with `pl-`.

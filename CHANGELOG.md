@@ -1,5 +1,70 @@
 # Changelog
 
+## Unreleased
+
+The version number and the release date are the maintainer's to set, so this
+section is unnumbered.
+
+**Finals week is a week.** Every card carried a `Final Exam:` line and nothing
+put them together, so finals week was only ever visible one card at a time.
+`docs/PAIN_POINTS.md` #6.
+
+- A calendar, not the list #6 proposes. A list answers "how many exams on
+  Friday". What changes a revision plan is when they sit: handing one in at 11am
+  and sitting down again at 11:30 is a different week from two exams a day
+  apart, and only a calendar says so.
+- Not the weekly grid `docs/ROADMAP.md` declined. That one is MyUCLA's and draws
+  the ten teaching weeks; finals week is the one week nothing on the page draws.
+  The day columns and hour rows deliberately copy it, for the reason 0.10.1
+  settled: nobody should have to learn a new timetable in week ten.
+- Seven columns anchored to the Saturday on or before the first exam, not to a
+  hardcoded date. Rows are the slots the plan actually uses, not a hardcoded
+  table of UCLA's exam times — that table would be a claim about the university
+  this page cannot check, and a wrong one during finals is worse than none.
+- Two exams an hour or less apart carry the gap between them. Two that overlap
+  are red, with the other class named: that one cannot be revised around.
+- A class already on your study list carries a double border, which is MyUCLA's
+  own mark rather than a new one. Its help text says enrolled *and waitlisted*
+  classes are drawn that way, so both are.
+- Nothing is reformatted. The date and time are sliced out of MyUCLA's own
+  sentence; the parsed numbers only decide which cell a block sits in. An
+  unreadable line, a weekday that disagrees with its date, or an exam outside
+  the anchored week is listed under the calendar rather than placed or dropped.
+- Reachable from the overflow menu always, and from a `Final Exams` switch in
+  MyUCLA's own row beside Study List, Plan and Alternates while the optional
+  layout switch is on.
+
+**A meeting in the weekly grid now leads to its class.** The grid says when a
+class meets, the list says everything else, and nothing joined them: a class
+spotted on Tuesday morning had to be found by scrolling seventeen cards looking
+for a name the grid never spelled out.
+
+- The grid abbreviates the subject where the card spells it out — `MGMT 170`
+  against `Management 170` — so the subject cannot be compared and a table of
+  abbreviations would be another unverifiable claim. Three things are written
+  identically on both sides and all three must agree: catalogue number, section,
+  and location.
+- A block matching two cards, or none, is left exactly as MyUCLA drew it. The
+  only change to MyUCLA's markup is a pointer, a tooltip, a focus ring and the
+  keys a thing announced as a link has to answer, so the pointer is itself the
+  promise that the link goes somewhere.
+- Landing on a card opens it, since plans of eight or more start collapsed.
+
+**Two things about the live page are now written down** in
+`docs/MYUCLA_CONTRACT.md`, both from MyUCLA's own words rather than inference:
+the weekly grid draws enrolled/waitlisted classes with a double border, planned
+ones with a single and alternates with a dashed; and its three display switches
+are not checkboxes but stacked `icon-check` buttons with the state kept in a
+class on the container.
+
+**Fixture corrections.** The final exam line is written two ways on the live
+page and the fixture knew only one; its weekly grid held three meetings that
+matched no card in the list, so nothing could exercise the abbreviation gap; and
+`.colorswatch`, which it invented, does not exist. `tidy` now exercises
+thirty-six grid blocks instead of three.
+
+Everything above is read-only: no new permissions, no requests, no writes.
+
 ## 0.10.3 — 2026-08-23
 
 **The extension has a face.** Until now Chrome drew the default grey puzzle

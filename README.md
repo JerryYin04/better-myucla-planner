@@ -35,6 +35,8 @@ Not made by, endorsed by, or affiliated with UCLA.
 | **Collapse** | Fold a class, or all of them, with seat status left on the title line. |
 | **Filter** | By course, instructor, page text, or your own note. |
 | **Clash list** | Which classes each one collides with, in time or final exam, read from MyUCLA's own popover payload. |
+| **Finals week** | Every final exam in your plan on one week, with overlaps in red and the gap named when two land an hour apart. |
+| **Grid to class** | Click a meeting in MyUCLA's weekly grid to land on that class in the list below. |
 
 `docs/ROADMAP.md` has the rest, including the optional layout switch and the
 things that were considered and declined.
