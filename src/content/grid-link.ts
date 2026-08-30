@@ -12,7 +12,7 @@
  * university that this page cannot check. Three things are written identically
  * on both sides, and all three have to agree:
  *
- *     catalogue number   151A
+ *     catalogue number   170
  *     section            Lec 1
  *     location           Entrepreneurs Hall C314
  *
@@ -120,7 +120,7 @@ export function linkGridBlocks(
     const lines = readBlockLines(block);
     if (lines.length < 3) return;
 
-    // `MGMT 170` becomes `151A`. Whatever came before it is the abbreviated
+    // `MGMT 170` becomes `170`. Whatever came before it is the abbreviated
     // subject and is never compared, because the card spells that out.
     const code = lines[0];
     const cut = code.lastIndexOf(" ");
